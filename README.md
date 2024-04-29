@@ -40,10 +40,61 @@ label'SLAVE01' : It indicateds the pipeline should run on the slave01 node
         buildDiscarder logRotator(
             daysToKeepStr: '15',
             numToKeepStr: '10'
-        )
+        ) 
     }
 **Explanation:**
 Tools: Here we are creating toolkit before starting project. Here we are using maven tool and version3
-buildDiscarder logRotator(...):
+buildDiscarder: This is like a setting a rule for how jenkins handle old builds 
+logrotator: This is a specific method jenkins used to handle old builds. 
+daystokeepstr15: Jenkins to keep build 15 days after 15 days it will automatically delete any builds
+numtokeepsrt10: This tells jenkins to keep 10 builds at a time. after 10 builds it will older one and it creates new builds
+--------------------------------------------------
+environment {
+        APP_NAME = "DCUBE_APP",
+        APP_ENV = "DEV"
+    }
+   Explanatination:  
+   environment: It is like a preparing workspace before starting the project and project name is ="DCUBE_APP" and env is dev
+   ---------------------------------------------------------
+   stages {
+        stage('Cleanup Workspace') {
+            steps {
+                cleanWs()
+                sh """
+                echo "Cleaned Up Workspace for ${APP_NAME}"
+                """
+            }
+        }
+     Explanation:
+      Stage(cleanup): It is cleaning workspace before doing the project
+      cleanWs(): It clean the workspace
+    ----------------------------------------------------
+    stage('Code Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/master']],
+                    userRemoteConfigs: [[url: 'https://github.com/spring-projects/spring-petclinic.git']]
+                ])
+            }
+        }
+        stage('Code Build') {
+            steps {
+                sh 'mvn install -Dmaven.test.skip=true'
+            }
+        }
+        stage('Printing All Global Variables') {
+            steps {
+                sh """
+                env
+                """
+            }
+        }
+    }
+}
+Explanatation:
+code checkout: here we are fectching code from gitrepo
+
+   
 
 
